@@ -2,6 +2,7 @@
 
 namespace Munin;
 
+use Stream\Exceptions\ReadStreamException;
 use Stream\ReceiveMethod\StreamGetContentsMethod;
 use Stream\Stream;
 
@@ -177,9 +178,10 @@ class Client implements ClientInterface
             // try read if last try was good
             if ($isReady) {
                 if ($isReady = $this->getStream()->isReadyForReading()) {
-                    // check false = error
-                    if (false !== ($content = $this->getStream()->getContents())) {
-                        $contents .= $content;
+                    // check ReadStreamException = error reading
+                    try {
+                        $contents .= $this->getStream()->getContents();
+                    } catch (ReadStreamException $e) {
                     }
                 }
             }

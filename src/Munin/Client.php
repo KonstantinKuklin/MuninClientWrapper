@@ -182,6 +182,8 @@ class Client implements ClientInterface
                     try {
                         $contents .= $this->getStream()->getContents();
                     } catch (ReadStreamException $e) {
+                        // munin can sent answer for request for a long time. Thats why we can get nothing and it will be error,
+                        // that is why we skip this exception
                     }
                 }
             }

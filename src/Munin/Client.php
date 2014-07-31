@@ -2,6 +2,7 @@
 
 namespace Munin;
 
+use Stream\ReceiveMethod\StreamGetContentsMethod;
 use Stream\Stream;
 
 /**
@@ -34,10 +35,12 @@ class Client implements ClientInterface
     public function __construct($host, $port = 4949)
     {
         $this->driver = new Driver();
+
         $this->stream = new Stream($host, Stream::PROTOCOL_TCP, $port, $this->driver);
         $this->stream->open();
         $this->stream->setBlockingOff();
         $this->stream->setReadTimeOut(3);
+        $this->stream->setReceiveMethod(new StreamGetContentsMethod());
     }
 
     /**
@@ -117,7 +120,7 @@ class Client implements ClientInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getVersion()
     {
@@ -133,7 +136,7 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param $plugin
+     * @param string $plugin
      *
      * @return array
      */
@@ -175,7 +178,7 @@ class Client implements ClientInterface
             if ($isReady) {
                 if ($isReady = $this->getStream()->isReadyForReading()) {
                     // check false = error
-                    if (false !== ($content = $this->getStream()->getContentsByStreamGetContents(1024))) {
+                    if (false !== ($content = $this->getStream()->getContents())) {
                         $contents .= $content;
                     }
                 }
